@@ -1,18 +1,24 @@
 import pandas as pd
+import joblib
+import mlflow
+
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import f1_score, precision_score, recall_score
-import joblib
+from prefect import task, flow
+
+
+
+mlflow.set_tracking_uri('sqlite:///mlflow/runs_info.db')
+mlflow.set_experiment('emotions-classifier')
 
 
 train_df = pd.read_parquet('data/parquet/train_data.parquet')
 test_df = pd.read_parquet('data/parquet/test_data.parquet')
 val_df = pd.read_parquet('data/parquet/val_data.parquet')
 
-# learning rate of 0.05
-# loss = "auto"
-# min sample leaf of 30
 
-def load_split_dataset(path):
+@task("Loading and Splitting Dataset")
+def load_split_dataset(path: str):
 
     print(f'Loading Dataset from {path} \n')
     data = pd.read_parquet(path=path)
@@ -23,13 +29,16 @@ def load_split_dataset(path):
     return X, y
 
 
+@task("Model Training in Progress")
 def model_training(train_X, train_y):
+
 
     model_hyperparameters = {
         "loss" : "log_loss",
         "learning_rate" : 0.05,
         "min_samples_leaf" : 30
     }
+
 
     clf = HistGradientBoostingClassifier(
         loss=model_hyperparameters["loss"],
@@ -49,6 +58,7 @@ def model_training(train_X, train_y):
     return model_hyperparameters, clf   
 
 
+@task("Model Validation in Progress")
 def model_validation(clf, val_X, val_y):
 
     val_X_vectors = [x for x in val_X]
@@ -68,17 +78,28 @@ def model_validation(clf, val_X, val_y):
 
     scores = {
         "F1 Score" : val_f1_score,
-        "\n Precision Score" : val_precision_score,
-        "\n Recall Score" : val_recall_score
+        "Precision Score" : val_precision_score,
+        "Recall Score" : val_recall_score
     }
 
     return scores
 
 
+@task("Logging Metrics in Progress")
 def logging(model_hyperparameters, metrics):
-    ...
+
+    print(f'Logging in Progress \n')
+
+    with mlflow.start_run():
+    
+        mlflow.log_params(model_hyperparameters)
+
+        mlflow.log_metrics(metrics)
+
+    print(f'Logging Completed \n')
 
 
+@flow("Running Processes from Main Function")
 def main(train_path, val_path):
 
     train_X, train_y = load_split_dataset(train_path)
