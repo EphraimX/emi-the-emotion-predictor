@@ -26,7 +26,7 @@ def load_split_dataset(path):
 def model_training(train_X, train_y):
 
     model_hyperparameters = {
-        "loss" : "auto",
+        "loss" : "log_loss",
         "learning_rate" : 0.05,
         "min_samples_leaf" : 30
     }
@@ -39,7 +39,10 @@ def model_training(train_X, train_y):
 
     print(f'Training Model on Data \n')
 
-    clf.fit(train_X, train_y)
+    # coverting series object to list of arrays for Sklearn to trai easily 
+    train_X_vectors = [x for x in train_X]
+
+    clf.fit(train_X_vectors, train_y)
 
     print(f'Model Training Completed \n')
 
@@ -48,21 +51,25 @@ def model_training(train_X, train_y):
 
 def model_validation(clf, val_X, val_y):
 
+    val_X_vectors = [x for x in val_X]
     y_true = val_y
-    y_pred = clf.predict(val_X)
 
-    print(f'Computing Metrics')
+    print(f'Validation in progress \n')
 
-    val_f1_score = f1_score(y_true=y_true, y_pred=y_pred)
-    val_precision_score = precision_score(y_true=y_true, y_pred=y_pred)
-    val_recall_score = recall_score(y_true=y_true, y_pred=y_pred)
+    y_pred = clf.predict(val_X_vectors)
 
-    print(f'Metrics Computed')
+    print(f'Computing Metrics \n')
+
+    val_f1_score = f1_score(y_true=y_true, y_pred=y_pred, average="weighted")
+    val_precision_score = precision_score(y_true=y_true, y_pred=y_pred, average="weighted")
+    val_recall_score = recall_score(y_true=y_true, y_pred=y_pred, average="weighted")
+
+    print(f'Metrics Computed \n')
 
     scores = {
         "F1 Score" : val_f1_score,
-        "Precision Score" : val_precision_score,
-        "Recall Score" : val_recall_score
+        "\n Precision Score" : val_precision_score,
+        "\n Recall Score" : val_recall_score
     }
 
     return scores
