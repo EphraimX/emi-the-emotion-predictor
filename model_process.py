@@ -1,6 +1,8 @@
 import pandas as pd
 import joblib
 import mlflow
+import mlflow.sklearn
+import datetime
 
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import f1_score, precision_score, recall_score
@@ -17,7 +19,7 @@ test_df = pd.read_parquet('data/parquet/test_data.parquet')
 val_df = pd.read_parquet('data/parquet/val_data.parquet')
 
 
-@task("Loading and Splitting Dataset")
+@task(name="Loading and Splitting Dataset")
 def load_split_dataset(path: str):
 
     print(f'Loading Dataset from {path} \n')
@@ -29,9 +31,10 @@ def load_split_dataset(path: str):
     return X, y
 
 
-@task("Model Training in Progress")
+@task(name="Model Training in Progress")
 def model_training(train_X, train_y):
 
+    model_name = "Histogram Gradient Boosting Classifier"
 
     model_hyperparameters = {
         "loss" : "log_loss",
@@ -55,10 +58,10 @@ def model_training(train_X, train_y):
 
     print(f'Model Training Completed \n')
 
-    return model_hyperparameters, clf   
+    return model_hyperparameters, clf, model_name
 
 
-@task("Model Validation in Progress")
+@task(name="Model Validation in Progress")
 def model_validation(clf, val_X, val_y):
 
     val_X_vectors = [x for x in val_X]
@@ -85,8 +88,8 @@ def model_validation(clf, val_X, val_y):
     return scores
 
 
-@task("Logging Metrics in Progress")
-def logging(model_hyperparameters, metrics):
+@task(name="Logging Metrics in Progress")
+def logging(model_hyperparameters, metrics, model, model_name):
 
     print(f'Logging in Progress \n')
 
@@ -96,20 +99,31 @@ def logging(model_hyperparameters, metrics):
 
         mlflow.log_metrics(metrics)
 
+        mlflow.sklearn.log_model(
+            sk_model=model,
+            artifact_path="mlflow/artifacts",
+            registered_model_name=f"{model_name} - {datetime.datetime.now()}"
+        )
+
     print(f'Logging Completed \n')
 
 
-@flow("Running Processes from Main Function")
+@flow(name="Running Processes from Main Function")
 def main(train_path, val_path):
 
     train_X, train_y = load_split_dataset(train_path)
     val_X, val_y = load_split_dataset(val_path)
 
-    model_hyperparameters, clf = model_training(train_X=train_X, train_y=train_y)
+    model_hyperparameters, clf, model_name = model_training(train_X=train_X, train_y=train_y)
     metrics = model_validation(clf, val_X=val_X, val_y=val_y)
 
     # log values to mlflow
-    logging(model_hyperparameters=model_hyperparameters, metrics=metrics) 
+    logging(
+            model_hyperparameters=model_hyperparameters, 
+            metrics=metrics, 
+            model=clf, 
+            model_name=model_name
+    ) 
 
     return metrics
 
