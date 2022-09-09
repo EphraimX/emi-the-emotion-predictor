@@ -1,7 +1,8 @@
 from fastapi import FastAPI
-import mlflow
-import re
 from sentence_transformers import SentenceTransformer
+import mlflow
+import numpy as np
+
 
 
 app = FastAPI()
@@ -18,8 +19,8 @@ encoder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 
 def predict(word):
-    encoder_request = encoder.encode(word)
-    model_prediction = model.predict(encoder_request)
+    encoded_request = encoder.encode(word)
+    model_prediction = model.predict([encoded_request])
 
     return model_prediction
 
@@ -28,15 +29,28 @@ def predict(word):
 async def home():
 
     response = {
-        "message" : "Hello"
+        "message" : " Hi, my name is Emi, and I can tell what you feel by telling me how you feel. \n Wanna give it a try? "
     }
 
     return response
 
 
 @app.post('/emotions')
-async def emotionsClassifer(request):
-    response = predict(word=request)
-    return response
-
+async def emotionsClassifer(request: str):
+    emotion = predict(word=request)
+    emotion = emotion[0]
+    print('Finding Errors')
     
+    emotion_class = {
+        0: "Joy",
+        1: "Sadness",
+        2: "Anger",
+        3: "Love",
+        4: "Fear",
+        5: "Surprise"
+    }
+    response = {
+        "emotions" : emotion_class[emotion]
+    }
+
+    return response["emotions"]
