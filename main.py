@@ -42,7 +42,7 @@ async def home(request: Request):
 
 
 @app.post('/emotions')
-async def emotionsClassifer(word_request: WordRequest):
+async def emotionsClassifer(request: Request, word_request: WordRequest):
     
     emotion = predict(word=word_request.request)
     emotion = emotion[0]
@@ -63,8 +63,8 @@ async def emotionsClassifer(word_request: WordRequest):
 
     response = response["emotions"]
 
-    return response
-    # return templates.TemplateResponse("emotions.html", {request:request, "emotion" : response})
+    # return response
+    return templates.TemplateResponse("emotions.html", {"request":request, "emotion" : response})
 
 
 # "endpoint": "https://srvre2.deta.dev",
