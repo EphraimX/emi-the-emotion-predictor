@@ -1,8 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
 from sentence_transformers import SentenceTransformer
 import mlflow
-
-
 
 
 app = FastAPI()
@@ -18,6 +17,9 @@ model = mlflow.pyfunc.load_model(model_path)
 encoder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 
+templates = Jinja2Templates(directory="views")
+
+
 def predict(word):
     encoded_request = encoder.encode(word)
     model_prediction = model.predict([encoded_request])
@@ -26,17 +28,18 @@ def predict(word):
 
 
 @app.get("/")
-async def home():
+async def home(request: Request):
 
     response = {
         "message" : " Hi, my name is Emi, and I can tell what you feel by telling me how you feel. \n Wanna give it a try? "
     }
 
-    return response
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.post('/emotions')
 async def emotionsClassifer(request: str):
+    
     emotion = predict(word=request)
     emotion = emotion[0]
     print('Finding Errors')
@@ -49,6 +52,7 @@ async def emotionsClassifer(request: str):
         4: "Fear",
         5: "Surprise"
     }
+
     response = {
         "emotions" : emotion_class[emotion]
     }
