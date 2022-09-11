@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import mlflow
 
@@ -16,8 +17,11 @@ model = mlflow.pyfunc.load_model(model_path)
 
 encoder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
-
 templates = Jinja2Templates(directory="views")
+
+
+class WordRequest(BaseModel):
+    request : str
 
 
 def predict(word):
@@ -38,9 +42,9 @@ async def home(request: Request):
 
 
 @app.post('/emotions')
-async def emotionsClassifer(request: str):
+async def emotionsClassifer(word_request: WordRequest):
     
-    emotion = predict(word=request)
+    emotion = predict(word=word_request.request)
     emotion = emotion[0]
     print('Finding Errors')
     
@@ -57,7 +61,10 @@ async def emotionsClassifer(request: str):
         "emotions" : emotion_class[emotion]
     }
 
-    return response["emotions"]
+    response = response["emotions"]
+
+    return response
+    # return templates.TemplateResponse("emotions.html", {request:request, "emotion" : response})
 
 
 # "endpoint": "https://srvre2.deta.dev",
