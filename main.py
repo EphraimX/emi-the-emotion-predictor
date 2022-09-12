@@ -1,11 +1,15 @@
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import mlflow
 
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 mlflow.set_tracking_uri('sqlite:///mlflow/runs_info.db')
 
@@ -31,7 +35,7 @@ def predict(word):
     return model_prediction
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
 
     response = {
@@ -46,7 +50,6 @@ async def emotionsClassifer(request: Request, word_request: WordRequest):
     
     emotion = predict(word=word_request.request)
     emotion = emotion[0]
-    print('Finding Errors')
     
     emotion_class = {
         0: "Joy",
