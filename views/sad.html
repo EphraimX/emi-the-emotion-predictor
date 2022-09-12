@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Emotions</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<style>
+body,h1 {font-family: "Raleway", sans-serif}
+body, html {height: 100%}
+.bgimg {
+  background-image: url('../static/images/bg-11.jpg');
+  min-height: 100%;
+  background-position: center;
+  background-size: cover;
+}
+</style>
+</head>
+<body>
+
+<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
+  <div class="w3-display-topleft w3-padding-large w3-xlarge">
+    Hi, {{username  }}
+  </div>
+  <div class="w3-display-middle">
+    <h1 class="w3-jumbo w3-animate-top" align="center">RIght Now, You Are Feeling {{emotion}}.</h1>
+    <hr class="w3-border-grey" style="margin:auto;width:40%">
+    <h2 class="w3-large w3-center" align="center">And that's okay, because as Hubert Selby Jr. said
+                                                "There's a sorrow and pain in everyone's life, but every now 
+                                                and then there's a ray of light that melts the loneliness in 
+                                                your heart and brings comfort like hot soup and a soft bed."
+                                                So cheer up, because we can only know what it means to be happy,
+                                                by feeling sad. </h2>
+  </div>
+  <div class="w3-display-bottomleft w3-padding-large">
+    You can check me out on <a href="https://www.linkedin.com/in/oghenefejiro-esosuota/">LinkedIn</a> and <a href="https://twitter.com/ee_ephraim">Twitter</a>
+  </div>
+</div>
+
+</body>
+</html>

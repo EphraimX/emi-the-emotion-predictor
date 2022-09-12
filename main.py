@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, File, UploadFile, Form    
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -25,6 +25,7 @@ templates = Jinja2Templates(directory="views")
 
 
 class WordRequest(BaseModel):
+    username: str
     request : str
 
 
@@ -42,13 +43,20 @@ async def home(request: Request):
         "message" : " Hi, my name is Emi, and I can tell what you feel by telling me how you feel. \n Wanna give it a try? "
     }
 
+    # username = request.query_params['username']
+    # feelings = request.query_params['requests']
+
+    # print(username, feelings)
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.post('/emotions')
-async def emotionsClassifer(request: Request, word_request: WordRequest):
+@app.get('/emotions')
+async def emotionsClassifer(request: Request):
+
+    username: str = request.query_params['username']
+    word_request: str = request.query_params['request']
     
-    emotion = predict(word=word_request.request)
+    emotion = predict(word=word_request)
     emotion = emotion[0]
     
     emotion_class = {
@@ -66,8 +74,60 @@ async def emotionsClassifer(request: Request, word_request: WordRequest):
 
     response = response["emotions"]
 
-    # return response
-    return templates.TemplateResponse("emotions.html", {"request":request, "emotion" : response})
+    if response == "Joy":
+        emotion_response = "Joyous"
+        return templates.TemplateResponse("joy.html",
+                                     {"request":request,
+                                      "username" : username,
+                                       "emotion" : emotion_response
+                                    })
+    
+
+    if response == "Sadness":
+        emotion_response = "Sad"
+        return templates.TemplateResponse("sad.html",
+                                     {"request":request,
+                                      "username" : username,
+                                       "emotion" : emotion_response
+                                    })
+    
+
+    if response == "Anger":
+        emotion_response = "Angry"
+        return templates.TemplateResponse("anger.html",
+                                     {"request":request,
+                                      "username" : username,
+                                       "emotion" : emotion_response
+                                    })
+    
+
+    if response == "Fear":
+        emotion_response = "Afraid"
+        return templates.TemplateResponse("fear.html",
+                                     {"request":request,
+                                      "username" : username,
+                                       "emotion" : response
+                                    })
+    
+
+    if response == "Surprise":
+        emotion_response = "Suprised"
+        return templates.TemplateResponse("surprise.html",
+                                     {"request":request,
+                                      "username" : username,
+                                       "emotion" : emotion_response
+                                    })
+    
+
+    if response == "Love":
+        emotion_response = "Loved"
+        return templates.TemplateResponse("love.html",
+                                     {"request":request,
+                                      "username" : username,
+                                       "emotion" : emotion_response
+                                    })
+    
+
 
 
 # "endpoint": "https://srvre2.deta.dev",
