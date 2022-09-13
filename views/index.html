@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Login V16</title>
+	<title>Emi - Emotions Predictor</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 <!--===============================================================================================-->	
-	<link rel="icon" type="image/png" href="{{ url_for('static', path='/images/icons/favicon.ico') }}"/>
+	<!-- <link rel="icon" type="image/png" href="{{ url_for('static', path='/images/icons/favicon.ico') }}"/> -->
+	<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', path='/images/favicon_io/apple-touch-icon.png') }}">
+	<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', path='/images/favicon_io/favicon-32x32.png') }}">
+	<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', path='/images/favicon_io/favicon-16x16.png') }}">
+	<link rel="manifest" href="{{ url_for('static', path='/images/favicon_io/site.webmanifest') }}">
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="{{ url_for ('static', path='/vendor/bootstrap/css/bootstrap.min.css') }}">
 <!--===============================================================================================-->
@@ -33,10 +37,12 @@
 		<div class="container-login100" style="background-image: url('../static/images/bg-05.jpg');">
 			<div class="wrap-login100 p-t-30 p-b-50">
 				<span class="login100-form-title p-b-41">
-					Hi, I'm Emi, Describe How You Feel Below, And I'll Tell You What You Feel &#128151. 
+					HI, MY NAME IS EMI; TELL ME HOW YOU FEEL BELOW, AND I'LL TELL YOU WHAT YOU FEEL &#128151.
+					<p style="color: white;">I would appreciate it if your description could be as detailed as possible; 
+												this allows me to produce the best results possible. Thank you.
+					</p>
 				</span>
-				<p> The description should be comprensive as possible to get the best results. </p>
-				<form class="login100-form validate-form p-b-33 p-t-5" method="get" action="/emotions">
+				<form class="login100-form validate-form p-b-33 p-t-5" method="post" action="/emotions">
 
 					<div class="wrap-input100 validate-input" data-validate = "Enter username">
 						<input class="input100" type="text" name="username" placeholder="Your Name" autocomplete="off">
@@ -44,7 +50,7 @@
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<input class="input100" type="text" name="request" placeholder="Describe How You Feel" autocomplete="off">
+						<textarea class="input100" type="text" name="word_request" placeholder="Describe How You Feel" autocomplete="off"></textarea>
 						<span class="focus-input100" data-placeholder="&#127801;"></span>
 					</div>
 

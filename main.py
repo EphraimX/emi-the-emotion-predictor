@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, File, UploadFile, Form    
+from fastapi import FastAPI, Request, Form    
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -50,11 +50,8 @@ async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.get('/emotions')
-async def emotionsClassifer(request: Request):
-
-    username: str = request.query_params['username']
-    word_request: str = request.query_params['request']
+@app.post('/emotions')
+async def emotionsClassifer(request: Request, username: str = Form(), word_request: str = Form()):
     
     emotion = predict(word=word_request)
     emotion = emotion[0]
