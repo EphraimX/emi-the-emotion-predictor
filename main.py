@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import mlflow
+import uvicorn
 
 
 app = FastAPI()
@@ -39,18 +40,16 @@ def predict(word):
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
 
-    response = {
-        "message" : " Hi, my name is Emi, and I can tell what you feel by telling me how you feel. \n Wanna give it a try? "
-    }
-
-    # username = request.query_params['username']
-    # feelings = request.query_params['requests']
-
-    # print(username, feelings)
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.post('/emotions')
+@app.get("/emotions", response_class=HTMLResponse)
+async def home(request: Request):
+
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.post('/emotions', response_class=HTMLResponse)
 async def emotionsClassifer(request: Request, username: str = Form(), word_request: str = Form()):
     
     emotion = predict(word=word_request)
@@ -72,7 +71,7 @@ async def emotionsClassifer(request: Request, username: str = Form(), word_reque
     response = response["emotions"]
 
     if response == "Joy":
-        emotion_response = "Joyous"
+        emotion_response = "Happy"
         return templates.TemplateResponse("joy.html",
                                      {"request":request,
                                       "username" : username,
@@ -103,7 +102,7 @@ async def emotionsClassifer(request: Request, username: str = Form(), word_reque
         return templates.TemplateResponse("fear.html",
                                      {"request":request,
                                       "username" : username,
-                                       "emotion" : response
+                                       "emotion" : emotion_response
                                     })
     
 
@@ -123,8 +122,3 @@ async def emotionsClassifer(request: Request, username: str = Form(), word_reque
                                       "username" : username,
                                        "emotion" : emotion_response
                                     })
-    
-
-
-
-# "endpoint": "https://srvre2.deta.dev",
